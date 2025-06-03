@@ -5,13 +5,12 @@ pipeline {
         DOCKER_IMAGE = "devops-node-app:latest"
         CONTAINER_NAME = "devops-app"
         APP_PORT = "3000"
-        TEAMS_WEBHOOK = credentials('teams-webhook')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/VasylSavka/devops-coursework.git'
+                git 'https://github.com/VasylSavka/devops-coursework.git'
             }
         }
 
@@ -47,13 +46,17 @@ pipeline {
     }
 
     post {
-        failure {
-            echo "❌ Build failed or service not healthy."
-            sh "./send-teams.sh '❌ Deployment failed on Jenkins' '${TEAMS_WEBHOOK}'"
-        }
         success {
             echo "✅ Service is up and healthy."
-            sh "./send-teams.sh '✅ Deployment succeeded on Jenkins' '${TEAMS_WEBHOOK}'"
+            withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
+                sh './send-teams.sh "✅ Deployment succeeded on Jenkins 🟢"'
+            }
+        }
+        failure {
+            echo "❌ Build failed or service not healthy."
+            withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
+                sh './send-teams.sh "❌ Deployment failed on Jenkins 🔴"'
+            }
         }
     }
 }

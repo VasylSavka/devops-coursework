@@ -1,8 +1,12 @@
 #!/bin/bash
 
 MESSAGE=$1
-WEBHOOK_URL=$2
+
+if [ -z "$TEAMS_WEBHOOK" ]; then
+  echo "❌ TEAMS_WEBHOOK is not set"
+  exit 1
+fi
 
 curl -H "Content-Type: application/json" \
   -d "{\"text\": \"${MESSAGE}\"}" \
-  "$WEBHOOK_URL"
+  "$TEAMS_WEBHOOK"
