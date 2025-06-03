@@ -13,7 +13,7 @@ COPY package*.json ./
 # Встановлюємо тільки production-залежності
 RUN npm install --production
 
-# Копіюємо решту файлів (включно з public/, server.js, data.json)
+# Копіюємо решту файлів (public/, server.js, data.json)
 COPY . .
 
 # Контейнер слухає на порту 3000
