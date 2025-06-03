@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = "devops-node-app:latest"
         CONTAINER_NAME = "devops-app"
         APP_PORT = "3000"
+        TEAMS_WEBHOOK = credentials('teams-webhook')
     }
 
     stages {
@@ -48,9 +49,11 @@ pipeline {
     post {
         failure {
             echo "❌ Build failed or service not healthy."
+            sh "./send-teams.sh '❌ Deployment failed on Jenkins' '${TEAMS_WEBHOOK}'"
         }
         success {
             echo "✅ Service is up and healthy."
+            sh "./send-teams.sh '✅ Deployment succeeded on Jenkins' '${TEAMS_WEBHOOK}'"
         }
     }
 }
