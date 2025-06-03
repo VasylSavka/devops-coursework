@@ -1,52 +1,56 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    IMAGE_NAME = "devops-node-app"
-    CONTAINER_NAME = "devops-app"
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        git url: 'https://github.com/VasylSavka/devops-coursework.git', branch: 'main'
-      }
+    environment {
+        DOCKER_IMAGE = "devops-node-app:latest"
+        CONTAINER_NAME = "devops-app"
+        APP_PORT = "3000"
     }
 
-    stage('Build Docker image') {
-      steps {
-        sh "docker build -t ${IMAGE_NAME}:latest ."
-      }
-    }
-
-    stage('Deploy container') {
-      steps {
-        sh """
-          docker stop ${CONTAINER_NAME} || true
-          docker rm ${CONTAINER_NAME} || true
-          docker run -d --name ${CONTAINER_NAME} -p 3000:3000 ${IMAGE_NAME}:latest
-        """
-      }
-    }
-
-    stage('Healthcheck') {
-      steps {
-        script{
-            retry(5){
-                sleep 3
-                sh 'curl --fail http://localhost:3000/health'
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/VasylSavka/devops-coursework.git'
             }
         }
-      }
-    }
-  }
 
-  post {
-    success {
-      echo '✅ Build and deployment successful!'
+        stage('Build Docker image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Deploy container') {
+            steps {
+                sh '''
+                    docker stop $CONTAINER_NAME || true
+                    docker rm $CONTAINER_NAME || true
+                    docker run -d --name $CONTAINER_NAME -p $APP_PORT:3000 $DOCKER_IMAGE
+                '''
+            }
+        }
+
+        stage('Healthcheck') {
+            steps {
+                script {
+                    timeout(time: 30, unit: 'SECONDS') {
+                        waitUntil {
+                            def health = sh(script: "docker inspect --format='{{.State.Health.Status}}' $CONTAINER_NAME", returnStdout: true).trim()
+                            echo "Container health: ${health}"
+                            return (health == "healthy")
+                        }
+                    }
+                }
+            }
+        }
     }
-    failure {
-      echo '❌ Build failed or service not healthy.'
+
+    post {
+        failure {
+            echo "❌ Build failed or service not healthy."
+        }
+        success {
+            echo "✅ Service is up and healthy."
+        }
     }
-  }
 }
