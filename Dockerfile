@@ -1,6 +1,9 @@
 # Базовий образ з Node.js
 FROM node:20-alpine
 
+# Встановлюємо curl для healthcheck
+RUN apk add --no-cache curl
+
 # Робоча директорія всередині контейнера
 WORKDIR /app
 
