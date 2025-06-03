@@ -17,7 +17,7 @@ COPY . .
 EXPOSE 3000
 
 # Add a healthcheck endpoint with curl
-HEALTHCHECK --interval=10s --timeout=3s --retries=5 CMD curl --fail http://localhost:3000/health || exit 1
+HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=5 CMD curl --fail http://localhost:3000/health || exit 1
 
 # Запуск додатку
 CMD ["node", "server.js"]
