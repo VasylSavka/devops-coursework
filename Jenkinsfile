@@ -49,13 +49,19 @@ pipeline {
         success {
             echo "✅ Service is up and healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-                sh './send-teams.sh "✅ Deployment succeeded on Jenkins 🟢"'
+                 sh '''
+                chmod +x ./send-teams.sh
+                ./send-teams.sh "✅ Deployment succeeded on Jenkins 🔵" "$TEAMS_WEBHOOK"
+            '''
             }
         }
         failure {
             echo "❌ Build failed or service not healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-                sh './send-teams.sh "❌ Deployment failed on Jenkins 🔴"'
+                sh '''
+                chmod +x ./send-teams.sh
+                ./send-teams.sh "❌ Deployment failed on Jenkins 🔴" "$TEAMS_WEBHOOK"
+            '''
             }
         }
     }
