@@ -13,12 +13,6 @@ pipeline {
       }
     }
 
-    stage('Install dependencies') {
-      steps {
-        sh 'npm install --production'
-      }
-    }
-
     stage('Build Docker image') {
       steps {
         sh "docker build -t ${IMAGE_NAME}:latest ."
