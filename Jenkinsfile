@@ -13,15 +13,14 @@ pipeline {
       }
     }
 
-    stage('Install dependencies & build') {
-      agent {
-        docker {
-          image 'node:20-alpine'
-          args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-      }
+    stage('Install dependencies') {
       steps {
         sh 'npm install --production'
+      }
+    }
+
+    stage('Build Docker image') {
+      steps {
         sh "docker build -t ${IMAGE_NAME}:latest ."
       }
     }
