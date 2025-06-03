@@ -31,7 +31,12 @@ pipeline {
 
     stage('Healthcheck') {
       steps {
-        sh 'curl --fail http://localhost:3000/health || exit 1'
+        script{
+            retry(5){
+                sleep 3
+                sh 'curl --fail http://localhost:3000/health'
+            }
+        }
       }
     }
   }
