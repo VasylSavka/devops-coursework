@@ -1,8 +1,12 @@
 const express = require("express");
+const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors()); // CORS ДО static
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
@@ -31,6 +35,6 @@ app.get("/:id", (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });

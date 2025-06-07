@@ -1,5 +1,5 @@
 const fetchData = async (url) => {
-   const response = await fetch(`http://localhost:3000/${url}`);
+   const response = await fetch(`/${url}`);
    return await response.json();
 }
 

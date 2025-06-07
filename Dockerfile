@@ -19,7 +19,7 @@ COPY . .
 # Контейнер слухає на порту 3000
 EXPOSE 3000
 
-# Add a healthcheck endpoint with curl
+# Додаємо healthcheck endpoint
 HEALTHCHECK --interval=5s --timeout=3s --start-period=5s --retries=5 CMD curl --fail http://localhost:3000/health || exit 1
 
 # Запуск додатку
