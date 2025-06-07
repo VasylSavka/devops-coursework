@@ -7,4 +7,3 @@ export MESSAGE
 export WEBHOOK_URL
 
 ./teams_notify.sh
-exit 0
