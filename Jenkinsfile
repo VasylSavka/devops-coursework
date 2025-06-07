@@ -22,7 +22,7 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY'),
-                    string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK'),
+                    string(credentialsId: 'teams-webhook-terraform', variable: 'TEAMS_WEBHOOK'),
                 ]) {
                     dir('terraform') {
                         // Ініціалізація Terraform і застосування змін до AWS
