@@ -33,7 +33,7 @@ resource "null_resource" "teams_notify_destroy" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "bash ./notify_destroy.sh ${self.triggers.teams_webhook_url}"
+    command = "bash ./notify_destroy.sh ${var.teams_webhook_url}"
   }
 }
 
