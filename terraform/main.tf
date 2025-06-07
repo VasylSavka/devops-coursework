@@ -28,12 +28,12 @@ resource "null_resource" "teams_notify_apply" {
 resource "null_resource" "teams_notify_destroy" {
   triggers = {
     always_run        = timestamp()
-    teams_webhook_url = var.teams_webhook_url
+    webhook_url       = var.teams_webhook_url
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "bash ./notify_destroy.sh ${var.teams_webhook_url}"
+    command = "bash ./notify_destroy.sh ${self.triggers.webhook_url}"
   }
 }
 
