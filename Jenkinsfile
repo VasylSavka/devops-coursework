@@ -74,7 +74,7 @@ pipeline {
 
     post {
         success {
-            // Повідомлення в Teams при успішному деплої
+            // Повідомлення в MsTeams при успішному деплої
             echo "✅ Service is up and healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
                 sh '''
@@ -85,7 +85,7 @@ pipeline {
         }
 
         failure {
-            // Повідомлення в Teams при помилці
+            // Повідомлення в MsTeams при помилці
             echo "❌ Build failed or service not healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
                 sh '''
