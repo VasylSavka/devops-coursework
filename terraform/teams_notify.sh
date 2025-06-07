@@ -13,5 +13,3 @@ curl -s -X POST "$WEBHOOK_URL" \
 }
 EOF
 )"
-
-exit 0 
