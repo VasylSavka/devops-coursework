@@ -27,6 +27,7 @@ pipeline {
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
                             terraform init -reconfigure
+                            terraform state rm null_resource.teams_notify_destroy || true
                             terraform apply -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK"
                         '''
                     }
