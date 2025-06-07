@@ -8,30 +8,26 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                // Завантаження коду з репозиторію
                 git branch: 'main', url: 'https://github.com/VasylSavka/devops-coursework.git'
             }
         }
 
         stage('Terraform Init & Apply') {
             steps {
-                // Підключення AWS credentials з Jenkins Credentials
                 withCredentials([
                     string(credentialsId: 'aws_access_key_id', variable: 'AWS_ACCESS_KEY_ID'),
                     string(credentialsId: 'aws_secret_access_key', variable: 'AWS_SECRET_ACCESS_KEY'),
-                    string(credentialsId: 'teams-webhook-terraform', variable: 'TEAMS_WEBHOOK'),
+                    string(credentialsId: 'teams-webhook-terraform', variable: 'TERRAFORM_WEBHOOK'),
                 ]) {
                     dir('terraform') {
-                        // Ініціалізація Terraform і застосування змін до AWS
                         sh '''
                             export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                             export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
                             terraform init -reconfigure
-                            terraform apply -auto-approve -var="teams_webhook_url=$TEAMS_WEBHOOK"
+                            terraform apply -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK"
                         '''
                     }
                 }
@@ -40,14 +36,12 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                // Побудова Docker-образу
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Deploy container') {
             steps {
-                // Розгортання контейнера
                 sh '''
                     docker stop $CONTAINER_NAME || true
                     docker rm $CONTAINER_NAME || true
@@ -58,7 +52,6 @@ pipeline {
 
         stage('Healthcheck') {
             steps {
-                // Перевірка стану контейнера через healthcheck
                 script {
                     timeout(time: 30, unit: 'SECONDS') {
                         waitUntil {
@@ -74,7 +67,6 @@ pipeline {
 
     post {
         success {
-            // Повідомлення в MsTeams при успішному деплої
             echo "✅ Service is up and healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
                 sh '''
@@ -85,7 +77,6 @@ pipeline {
         }
 
         failure {
-            // Повідомлення в MsTeams при помилці
             echo "❌ Build failed or service not healthy."
             withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
                 sh '''
