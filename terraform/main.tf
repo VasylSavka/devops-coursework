@@ -34,15 +34,6 @@ resource "null_resource" "teams_notify_destroy" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = <<EOT
-bash -c '
-  action_value="${self.triggers.action}"
-  if [ "$action_value" = "destroy" ]; then
-    bash ./notify_destroy.sh "${self.triggers.webhook_url}" "🗑️ Terraform destroy: EC2 instance is being terminated."
-  else
-    bash ./notify_destroy.sh "${self.triggers.webhook_url}" "🛠️ Terraform apply is replacing EC2 instance..."
-  fi
-'
-EOT
+    command = "bash ./destroy_logic.sh \"${self.triggers.action}\" \"${self.triggers.webhook_url}\""
   }
 }
