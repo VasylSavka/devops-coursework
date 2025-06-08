@@ -27,7 +27,7 @@ resource "null_resource" "teams_notify_apply" {
 
 resource "null_resource" "teams_notify_destroy" {
   triggers = {
-    always_run  = timestamp()
+    instance_id = aws_instance.devops_app.id
     webhook_url = var.teams_webhook_url
   }
 
