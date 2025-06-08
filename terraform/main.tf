@@ -26,22 +26,8 @@ resource "null_resource" "teams_notify_apply" {
 }
 
 resource "null_resource" "teams_notify_destroy" {
-  triggers = {
-    always_run  = timestamp()
-    webhook_url = var.teams_webhook_url
-    action_flag = var.action  # <== Ренеймінг допомагає уникнути name collision
-  }
-
   provisioner "local-exec" {
-    when = destroy
-    command = <<EOT
-      ACTION_FLAG="${self.triggers.action_flag}"
-      if [ "$${ACTION_FLAG}" = "destroy" ]; then
-        bash ./notify_destroy.sh "${self.triggers.webhook_url}" "🗑️ Terraform destroy: EC2 instance is being terminated."
-      else
-        bash ./notify_destroy.sh "${self.triggers.webhook_url}" "🛠️ Terraform apply is replacing EC2 instance..."
-      fi
-    EOT
+    when    = destroy
+    command = "bash ./notify_destroy.sh \"${var.teams_webhook_url}\" \"🗑️ EC2 instance is being destroyed via terraform destroy\""
   }
 }
-
