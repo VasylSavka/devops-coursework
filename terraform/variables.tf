@@ -14,3 +14,8 @@ variable "teams_webhook_url" {
   type = string
   description = "Microsoft Teams terraform webhook URL"
 }
+
+variable "action" {
+  type    = string
+  default = "apply"
+}

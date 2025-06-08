@@ -1,6 +1,12 @@
 #!/bin/bash
-MESSAGE="Terraform destroy: EC2 instance is being terminated."
-WEBHOOK_URL="$1"
 
-MESSAGE="$MESSAGE" WEBHOOK_URL="$WEBHOOK_URL" ./teams_notify.sh
-    
+WEBHOOK_URL=$1
+MESSAGE=$2
+
+cat <<EOF > payload.json
+{
+  "text": "${MESSAGE}"
+}
+EOF
+
+curl -H "Content-Type: application/json" -d @payload.json $WEBHOOK_URL

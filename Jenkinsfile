@@ -34,9 +34,9 @@ pipeline {
               terraform init -reconfigure
 
               if [ "$ACTION" = "destroy" ]; then
-                terraform destroy -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK"
+                terraform destroy -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK" -var="action=destroy"
               else
-                terraform apply -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK"
+                terraform apply -auto-approve -var="teams_webhook_url=$TERRAFORM_WEBHOOK" -var="action=apply"
               fi
             '''
           }

@@ -27,13 +27,20 @@ resource "null_resource" "teams_notify_apply" {
 
 resource "null_resource" "teams_notify_destroy" {
   triggers = {
+    instance_id = aws_instance.devops_app.id
     webhook_url = var.teams_webhook_url
-    always_run  = timestamp()
+    action      = var.action
   }
 
   provisioner "local-exec" {
-    when    = destroy
-    command = "bash ./notify_destroy.sh ${self.triggers.webhook_url}"
+    when = destroy
+    command = <<EOT
+      if [ "${self.triggers.action}" = "destroy" ]; then
+        bash ./notify_destroy.sh ${self.triggers.webhook_url} "🗑️ Terraform destroy: EC2 instance is being terminated."
+      else
+        bash ./notify_destroy.sh ${self.triggers.webhook_url} "🛠️ Terraform apply is replacing EC2 instance..."
+      fi
+    EOT
   }
 }
 
