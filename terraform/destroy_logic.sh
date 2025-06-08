@@ -1,4 +1,5 @@
 #!/bin/bash
+
 action_value="$1"
 webhook="$2"
 
