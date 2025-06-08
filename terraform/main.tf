@@ -27,9 +27,9 @@ resource "null_resource" "teams_notify_apply" {
 
 resource "null_resource" "teams_notify_destroy" {
   triggers = {
-    action      = var.action
-    webhook_url = var.teams_webhook_url
     always_run  = timestamp()
+    webhook_url = var.teams_webhook_url
+    action      = var.action
   }
 
   provisioner "local-exec" {
