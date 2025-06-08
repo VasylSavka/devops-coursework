@@ -86,66 +86,48 @@ pipeline {
   }
 
   post {
-    success {
-      script {
-        def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
-        def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
-        def job = env.JOB_NAME
-        def buildNum = env.BUILD_NUMBER
-        def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
-        def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
-        def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+  success {
+    script {
+      def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
+      def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
+      def job = env.JOB_NAME
+      def buildNum = env.BUILD_NUMBER
+      def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
+      def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
+      def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
 
-        def message = (params.ACTION == 'apply') ?
-            """✅ Deployment succeeded on Jenkins 🔵
-🕒 Time: ${timestamp}
-👤 User: ${user}
-🏷️ Job: ${job}
-🔢 Build: #${buildNum}
-💬 Commit: ${gitCommit} - ${gitMessage}
-🌿 Branch: ${branch}""" :
-            """🗑️ Terraform destroy executed from Jenkins ⚠️
-🕒 Time: ${timestamp}
-👤 User: ${user}
-🏷️ Job: ${job}
-🔢 Build: #${buildNum}
-💬 Commit: ${gitCommit} - ${gitMessage}
-🌿 Branch: ${branch}"""
+      def message = (params.ACTION == 'apply') ?
+          """✅ Deployment succeeded on Jenkins 🔵\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}""" :
+          """🗑️ Terraform destroy executed from Jenkins ⚠️\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}"""
 
-        withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-          sh """
-            chmod +x ./send-teams.sh
-            ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
-          """
-        }
-      }
-    }
-
-    failure {
-      script {
-        def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
-        def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
-        def job = env.JOB_NAME
-        def buildNum = env.BUILD_NUMBER
-        def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
-        def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
-        def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-
-        def message = """❌ Deployment failed on Jenkins 🔴
-🕒 Time: ${timestamp}
-👤 User: ${user}
-🏷️ Job: ${job}
-🔢 Build: #${buildNum}
-💬 Commit: ${gitCommit} - ${gitMessage}
-🌿 Branch: ${branch}"""
-
-        withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-          sh """
-            chmod +x ./send-teams.sh
-            ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
-          """
-        }
+      withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
+        sh """
+          chmod +x ./send-teams.sh
+          ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
+        """
       }
     }
   }
+
+  failure {
+    script {
+      def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
+      def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
+      def job = env.JOB_NAME
+      def buildNum = env.BUILD_NUMBER
+      def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
+      def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
+      def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+
+      def message = """❌ Deployment failed on Jenkins 🔴\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}"""
+
+      withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
+        sh """
+          chmod +x ./send-teams.sh
+          ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
+        """
+      }
+    }
+  }
+}
 }
