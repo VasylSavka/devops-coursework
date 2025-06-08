@@ -29,11 +29,11 @@ resource "null_resource" "teams_notify_destroy" {
   triggers = {
     always_run  = timestamp()
     webhook_url = var.teams_webhook_url
-    action_flag = var.action != null ? var.action : "unknown"
+    action      = var.action != null ? var.action : "destroy"
   }
 
   provisioner "local-exec" {
-    when    = destroy
-    command = "bash ./destroy_logic.sh \"${self.triggers.action_flag}\" \"${self.triggers.webhook_url}\""
+    when = destroy
+    command = "bash ./destroy_logic.sh \"${self.triggers.action}\" \"${self.triggers.webhook_url}\""
   }
 }
