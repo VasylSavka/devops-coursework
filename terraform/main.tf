@@ -25,16 +25,15 @@ resource "null_resource" "teams_notify_apply" {
   }
 }
 
-resource "null_resource" "teams_notify_destroy" {
+resource "null_resource" "teams_notify_destroy_notify" {
   triggers = {
-    always_run   = timestamp()
-    webhook_url  = var.teams_webhook_url
-    action_flag  = var.action != null ? var.action : "unknown"
+    always_run  = timestamp()
+    webhook_url = var.teams_webhook_url
+    message     = "🗑️ Terraform destroy: EC2 instance is being terminated."
   }
 
   provisioner "local-exec" {
-    when = destroy
-    command = "bash ./destroy_logic.sh \"${self.triggers.action_flag}\" \"${self.triggers.webhook_url}\""
+    when    = destroy
+    command = "bash ./notify_destroy.sh \"${self.triggers.webhook_url}\" \"${self.triggers.message}\""
   }
 }
-
