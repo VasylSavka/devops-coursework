@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "ami_id" {
-  default = "ami-006b4a3ad5f56fbd6" # Amazon Linux 2 у eu-north-1
+  default = "ami-006b4a3ad5f56fbd6"
 }
 
 variable "instance_type" {

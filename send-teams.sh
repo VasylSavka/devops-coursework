@@ -3,7 +3,6 @@
 MESSAGE=$1
 WEBHOOK_URL=$2
 
-# Додаткові параметри
 TIME=$(date "+%Y-%m-%d %H:%M:%S")
 USER=${BUILD_USER_ID:-"N/A"}
 JOB_NAME=${JOB_NAME:-"N/A"}
@@ -11,7 +10,6 @@ BUILD_NUMBER=${BUILD_NUMBER:-"N/A"}
 GIT_COMMIT_MSG=$(git log -1 --pretty=%s || echo "N/A")
 GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD || echo "main")
 
-# Вивід повідомлення у JSON у стовпчик (Teams Adaptive Card)
 cat <<EOF > payload.json
 {
   "@type": "MessageCard",
