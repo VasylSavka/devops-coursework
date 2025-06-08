@@ -31,7 +31,6 @@ pipeline {
             sh '''
               export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
               export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-
               terraform init -reconfigure
 
               if [ "$ACTION" = "destroy" ]; then
@@ -86,48 +85,28 @@ pipeline {
   }
 
   post {
-  success {
-    script {
-      def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
-      def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
-      def job = env.JOB_NAME
-      def buildNum = env.BUILD_NUMBER
-      def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
-      def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
-      def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-
-      def message = (params.ACTION == 'apply') ?
-          """✅ Deployment succeeded on Jenkins 🔵\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}""" :
-          """🗑️ Terraform destroy executed from Jenkins ⚠️\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}"""
-
+    success {
       withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-        sh """
+        script {
+          def msg = (params.ACTION == 'apply') ?
+              "✅ Deployment succeeded on Jenkins 🔵" :
+              "🗑️ Terraform destroy executed from Jenkins ⚠️"
+          sh """
+            chmod +x ./send-teams.sh
+            ./send-teams.sh "${msg}" "$TEAMS_WEBHOOK"
+          """
+        }
+      }
+    }
+
+    failure {
+      echo "❌ Build failed or service not healthy."
+      withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
+        sh '''
           chmod +x ./send-teams.sh
-          ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
-        """
+          ./send-teams.sh "❌ Deployment failed on Jenkins 🔴" "$TEAMS_WEBHOOK"
+        '''
       }
     }
   }
-
-  failure {
-    script {
-      def timestamp = new Date().format("yyyy-MM-dd HH:mm:ss")
-      def user = currentBuild.getBuildCauses()[0]?.userName ?: "N/A"
-      def job = env.JOB_NAME
-      def buildNum = env.BUILD_NUMBER
-      def gitCommit = sh(script: 'git log -1 --pretty=format:%h', returnStdout: true).trim()
-      def gitMessage = sh(script: 'git log -1 --pretty=%s', returnStdout: true).trim()
-      def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-
-      def message = """❌ Deployment failed on Jenkins 🔴\\n🕒 Time: ${timestamp}\\n👤 User: ${user}\\n🏷️ Job: ${job}\\n🔢 Build: #${buildNum}\\n💬 Commit: ${gitCommit} - ${gitMessage}\\n🌿 Branch: ${branch}"""
-
-      withCredentials([string(credentialsId: 'teams-webhook', variable: 'TEAMS_WEBHOOK')]) {
-        sh """
-          chmod +x ./send-teams.sh
-          ./send-teams.sh "${message}" "$TEAMS_WEBHOOK"
-        """
-      }
-    }
-  }
-}
 }
