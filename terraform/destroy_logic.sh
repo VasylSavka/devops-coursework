@@ -1,10 +1,10 @@
 #!/bin/bash
 
-action="$1"
-webhook="$2"
+ACTION="$1"
+WEBHOOK="$2"
 
-if [ "$action" = "destroy" ]; then
-  bash ./notify_destroy.sh "$webhook" "🗑️ Terraform destroy: EC2 instance is being terminated."
+if [ "$ACTION" = "destroy" ]; then
+  bash ./notify_destroy.sh "$WEBHOOK" "🗑️ Terraform destroy: EC2 instance is being terminated."
 else
-  bash ./notify_destroy.sh "$webhook" "🛠️ Terraform apply is replacing EC2 instance..."
+  bash ./notify_destroy.sh "$WEBHOOK" "🛠️ Terraform apply is replacing EC2 instance..."
 fi
