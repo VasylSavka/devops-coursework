@@ -27,11 +27,13 @@ resource "null_resource" "teams_notify_apply" {
 
 resource "null_resource" "teams_notify_destroy" {
   triggers = {
+    always_run = timestamp()
     instance_id = aws_instance.devops_app.id
   }
 
   provisioner "local-exec" {
     when    = destroy
-    command = "bash ./notify_destroy.sh ${self.triggers.webhook_url}"
+    command = "bash ./notify_destroy.sh ${var.teams_webhook_url}"
   }
 }
+
