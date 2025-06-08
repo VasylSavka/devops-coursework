@@ -29,7 +29,7 @@ resource "null_resource" "teams_notify_destroy" {
   triggers = {
     instance_id = aws_instance.devops_app.id
     webhook_url = var.teams_webhook_url
-    action      = var.action
+    action      = var.action   
   }
 
   provisioner "local-exec" {
@@ -43,5 +43,6 @@ resource "null_resource" "teams_notify_destroy" {
     EOT
   }
 }
+
 
 
