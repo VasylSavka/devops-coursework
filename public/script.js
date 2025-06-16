@@ -41,3 +41,4 @@ const nav = document.querySelector('.nav');
 nav.addEventListener('click', (el) => {
    showDataFrame(el.target.innerText);
 });
+//new function
